@@ -45,8 +45,6 @@ export class AuthController {
     async login(@Body() dto: LoginDto, @Res() res: Response, @UserAgent() agent: string) {
         const tokens = await this.authService.login(dto, agent);
 
-        console.log({ agent }, 'agent');
-
         if (!tokens)
             throw new BadRequestException(
                 `it is not possible to login a user with data ${JSON.stringify(dto)}`,

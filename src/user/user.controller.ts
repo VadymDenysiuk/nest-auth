@@ -36,8 +36,6 @@ export class UserController {
     @Roles(Role.ADMIN)
     @Get()
     me(@CurrentUser() user: JwtPayload) {
-        console.log({ user });
-
         return user;
     }
 }
