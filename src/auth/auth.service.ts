@@ -73,6 +73,7 @@ export class AuthService {
 
         return { accessToken, refreshToken };
     }
+
     private async getRefreshToken(userId: string, agent: string): Promise<Token> {
         const token = await this.prismaServide.token.findFirst({
             where: { userId, userAgent: agent },
@@ -83,5 +84,9 @@ export class AuthService {
             update: { token: v4(), exp: add(new Date(), { months: 1 }) },
             create: { token: v4(), exp: add(new Date(), { months: 1 }), userId, userAgent: agent },
         });
+    }
+
+    deleteRefreshToken(token: string) {
+        return this.prismaServide.token.delete({ where: { token } });
     }
 }
