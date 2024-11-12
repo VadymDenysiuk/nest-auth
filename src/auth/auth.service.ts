@@ -1,9 +1,16 @@
-import { ConflictException, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import {
+    ConflictException,
+    HttpException,
+    HttpStatus,
+    Injectable,
+    Logger,
+    UnauthorizedException,
+} from '@nestjs/common';
 import { LoginDto, RegisterDto } from './dto';
 import { UserService } from 'src/user/user.service';
 import { Tokens } from './interfaces';
 import { compareSync } from 'bcrypt';
-import { Token, User } from '@prisma/client';
+import { Provider, Token, User } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { v4 } from 'uuid';
@@ -88,5 +95,27 @@ export class AuthService {
 
     deleteRefreshToken(token: string) {
         return this.prismaServide.token.delete({ where: { token } });
+    }
+
+    async googleAuth(email: string, agent: string) {
+        const userExist = await this.userService.findOne(email);
+
+        if (userExist) return this.generateTokens(userExist, agent);
+
+        const user = await this.userService
+            .save({ email, provider: Provider.GOOGLE })
+            .catch((err) => {
+                this.logger.error(err);
+
+                return null;
+            });
+
+        if (!user)
+            throw new HttpException(
+                `Can't create user with email ${email}`,
+                HttpStatus.BAD_REQUEST,
+            );
+
+        return this.generateTokens(user, agent);
     }
 }

@@ -1,4 +1,4 @@
-import { $Enums, User } from '@prisma/client';
+import { $Enums, Provider, User } from '@prisma/client';
 import { Exclude } from 'class-transformer';
 
 export class UserResponse implements User {
@@ -10,6 +10,9 @@ export class UserResponse implements User {
 
     @Exclude()
     createdAt: Date;
+
+    @Exclude()
+    provider: Provider;
 
     updatedAt: Date;
     roles: $Enums.Role[];
